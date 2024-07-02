@@ -12,9 +12,12 @@ pipeline {
                  sh 'mvn clean package'
             }
         }
-        stage('deploy') {
+        stage('sonar') {
             steps {
-                deploy adapters: [tomcat9(credentialsId: 'a35ec96e-7e25-402e-a84b-f4517fe41120', path: '', url: 'http://13.233.172.163:8080')], contextPath: 'nice', war: '**/*.war'
+               mvn sonar:sonar \
+  -Dsonar.projectKey=sample1 \
+  -Dsonar.host.url=http://13.201.130.14:9000 \
+  -Dsonar.login=e264c1b71011e0069024abf18e403b1c650ad409
             }
         }
     }
