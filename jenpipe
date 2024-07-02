@@ -12,5 +12,13 @@ pipeline {
                  sh 'mvn clean package'
             }
         }
+         stage('sonar') {
+            steps {
+                 sh 'mvn sonar:sonar \
+  -Dsonar.projectKey=sample1 \
+  -Dsonar.host.url=http://13.201.130.14:9000 \
+  -Dsonar.login=e264c1b71011e0069024abf18e403b1c650ad409'
+            }
+        }
     }
 }
