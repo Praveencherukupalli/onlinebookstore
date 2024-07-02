@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('clone') {
             steps {
-                  git changelog: false, poll: false, url: 'https://github.com/Saichinta98/onlinebookstore.git'
+                  git 'https://github.com/Saichinta98/onlinebookstore.git'
             }
         }
         stage('build') {
