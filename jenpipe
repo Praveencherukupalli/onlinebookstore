@@ -1,24 +1,11 @@
-pipeline {
-    agent any
-
-    stages {
-        stage('clone') {
-            steps {
-                  git 'https://github.com/Saichinta98/onlinebookstore.git'
-            }
-        }
-        stage('build') {
-            steps {
-                 sh 'mvn clean package'
-            }
-        }
-         stage('sonar') {
-            steps {
-                 sh 'mvn sonar:sonar \
-  -Dsonar.projectKey=sample1 \
-  -Dsonar.host.url=http://13.201.130.14:9000 \
-  -Dsonar.login=e264c1b71011e0069024abf18e403b1c650ad409'
-            }
-        }
+node {
+  stage('SCM') {
+    checkout scm
+  }
+  stage('SonarQube Analysis') {
+    def mvn = tool 'Default Maven';
+    withSonarQubeEnv() {
+      sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=online -Dsonar.projectName='online'"
     }
+  }
 }
