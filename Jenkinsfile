@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'yourdockerhubusername/onlinebookstore'
+        DOCKER_IMAGE = 'praveencherukupalli28/onlinebookstore'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/yourusername/onlinebookstore.git'
+                git 'https://github.com/Praveencherukupalli/onlinebookstore.git'
             }
         }
 
@@ -28,7 +28,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'dockerhub-password', variable: 'DOCKERHUB_PASS')]) {
                     sh """
-                      echo $DOCKERHUB_PASS | docker login -u yourdockerhubusername --password-stdin
+                      echo $DOCKERHUB_PASS | docker login -u  --password-stdin
                       docker push $DOCKER_IMAGE:$BUILD_NUMBER
                       docker tag $DOCKER_IMAGE:$BUILD_NUMBER $DOCKER_IMAGE:latest
                       docker push $DOCKER_IMAGE:latest
