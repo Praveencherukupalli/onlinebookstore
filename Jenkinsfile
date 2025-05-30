@@ -11,7 +11,11 @@ pipeline {
         git 'https://github.com/Praveencherukupalli/onlinebookstore.git'
       }
     }
-
+    stage('Build with Maven') {
+    steps {
+        sh 'mvn clean package'
+    }
+}
     stage('Build Docker Image') {
       steps {
         script {
@@ -40,17 +44,10 @@ pipeline {
       }
     }
   }
-
   post {
-    success {
-      mail to: 'team@example.com',
-           subject: "✅ CI/CD Success - ${env.JOB_NAME}",
-           body: "Deployment succeeded!"
-    }
     failure {
-      mail to: 'team@example.com',
-           subject: "❌ CI/CD Failure - ${env.JOB_NAME}",
-           body: "Check Jenkins for errors."
+        mail to: 'you@example.com',
+             subject: "Jenkins Build Failed",
+             body: "Check Jenkins job: ${env.JOB_NAME} - Build #${env.BUILD_NUMBER}"
     }
-  }
 }
