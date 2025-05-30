@@ -1,46 +1,56 @@
 pipeline {
-    agent any
+  agent any
+  environment {
+    IMAGE_NAME = 'praveencherukupalli28/onlinebookstore'
+    CONTAINER_NAME = 'myapp'
+  }
 
-    environment {
-        DOCKER_IMAGE = 'praveencherukupalli28/onlinebookstore'
+  stages {
+    stage('Checkout') {
+      steps {
+        git 'https://github.com/Praveencherukupalli/onlinebookstore.git'
+      }
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/Praveencherukupalli/onlinebookstore.git'
-            }
+    stage('Build Docker Image') {
+      steps {
+        script {
+          docker.build("${IMAGE_NAME}:latest")
         }
-
-        stage('Build') {
-            steps {
-                sh './mvnw clean package -DskipTests'
-            }
-        }
-
-        stage('Docker Build') {
-            steps {
-                sh 'docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .'
-            }
-        }
-
-        stage('Docker Push') {
-            steps {
-                withCredentials([string(credentialsId: 'dockerhub-password', variable: 'DOCKERHUB_PASS')]) {
-                    sh """
-                      echo $DOCKERHUB_PASS | docker login -u  --password-stdin
-                      docker push $DOCKER_IMAGE:$BUILD_NUMBER
-                      docker tag $DOCKER_IMAGE:$BUILD_NUMBER $DOCKER_IMAGE:latest
-                      docker push $DOCKER_IMAGE:latest
-                    """
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sh "docker run -d -p 8080:8080 $DOCKER_IMAGE:latest"
-            }
-        }
+      }
     }
+
+    stage('Push to Docker Hub') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+          sh '''
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            docker push ${IMAGE_NAME}:latest
+          '''
+        }
+      }
+    }
+
+    stage('Deploy Docker Container') {
+      steps {
+        script {
+          sh "docker rm -f ${CONTAINER_NAME} || true"
+          sh "docker run -d -p 3000:3000 --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest"
+        }
+      }
+    }
+  }
+
+  post {
+    success {
+      mail to: 'team@example.com',
+           subject: "✅ CI/CD Success - ${env.JOB_NAME}",
+           body: "Deployment succeeded!"
+    }
+    failure {
+      mail to: 'team@example.com',
+           subject: "❌ CI/CD Failure - ${env.JOB_NAME}",
+           body: "Check Jenkins for errors."
+    }
+  }
 }
