@@ -1,5 +1,10 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'abhishekf5/maven-abhishek-docker-agent:v1'
+      args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+    }
+  }
 
   environment {
     IMAGE_NAME = 'praveencherukupalli28/onlinebookstore'
@@ -30,10 +35,12 @@ pipeline {
     stage('Push to Docker Hub') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-          sh '''
-            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            docker push ${IMAGE_NAME}:latest
-          '''
+          script {
+            sh '''
+              echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+              docker push ${IMAGE_NAME}:latest
+            '''
+          }
         }
       }
     }
@@ -41,19 +48,13 @@ pipeline {
     stage('Deploy Docker Container') {
       steps {
         script {
-          // Remove old container if exists
-          sh "docker rm -f ${CONTAINER_NAME} || true"
-          // Run container mapping port 8080 inside container to 3000 on host
-          sh "docker run -d -p 3000:8080 --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest"
+          sh '''
+            docker rm -f ${CONTAINER_NAME} || true
+            docker run -d -p 3000:8080 --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest
+          '''
         }
       }
     }
   }
 
-  post {
-    failure {
-      echo "Build failed - Email notifications disabled or configure SMTP"
-      // Optionally add email step here if SMTP configured
-    }
-  }
-}
+  p
