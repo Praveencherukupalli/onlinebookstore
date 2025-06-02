@@ -1,5 +1,5 @@
 # Use Java 21 base image
-FROM openjdk:21-jdk-slim
+FROM openjdk:17-jdk-slim
 
 # Copy the JAR file into the container
 COPY target/onlinebookstore-1.0.jar app.jar
