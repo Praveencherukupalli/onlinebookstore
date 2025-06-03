@@ -6,7 +6,8 @@ pipeline {
         DOCKER_TAG = 'latest'
         SONARQUBE_ENV = 'SonarQube' // Jenkins config name for SonarQube server
     }
-   stages {
+
+    stages {
         stage('Checkout') {
             steps {
                 checkout scm
@@ -25,6 +26,12 @@ pipeline {
             }
         }
 
+        stage('Verify Build Artifacts') {
+            steps {
+                sh 'ls -lh target'
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_AUTH_TOKEN')]) {
@@ -37,7 +44,8 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                // No cache to ensure rebuild and fresh JAR copy
+                sh "docker build --no-cache -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
             }
         }
 
