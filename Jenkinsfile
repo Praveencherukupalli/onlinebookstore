@@ -6,7 +6,7 @@ pipeline {
     }
 }
  environment {
-    SONAR_URL = "http://44.212.35.176:9000"
+    SONAR_URL = "http://18.209.60.235:9000"
     DOCKER_IMAGE = "praveencherukupalli/onlinebookstore:${BUILD_NUMBER}"
     CONTAINER_NAME = "onlinebookstore-container"
     REGISTRY_CREDENTIALS = credentials('docker-cred')
