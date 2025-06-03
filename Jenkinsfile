@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'praveencherukupalli28/onlinebookstore'
         DOCKER_TAG = 'latest'
-        SONARQUBE_ENV = 'sonarqube' // Jenkins config name for SonarQube server
+        SONARQUBE_ENV = 'SonarQube' // Jenkins config name for SonarQube server
     }
    stages {
         stage('Checkout') {
