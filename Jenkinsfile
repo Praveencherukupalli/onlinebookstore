@@ -6,13 +6,7 @@ pipeline {
         DOCKER_TAG = 'latest'
         SONARQUBE_ENV = 'sonarqube' // Jenkins config name for SonarQube server
     }
-
-    tools {
-        maven 'Maven 3'
-        sonarQubeScanner 'SonarQube Scanner'
-    }
-
-    stages {
+   stages {
         stage('Checkout') {
             steps {
                 checkout scm
