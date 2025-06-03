@@ -1,12 +1,11 @@
 pipeline {
   agent {
     docker {
-      image 'abhishekf5/maven-abhishek-docker-agent:v1'
-      args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+        image 'maven:3.8.6-eclipse-temurin-17-alpine'
+        args '-v /root/.m2:/root/.m2'
     }
-  }
-
-  environment {
+}
+ environment {
     SONAR_URL = "http://44.212.35.176:9000"
     DOCKER_IMAGE = "praveencherukupalli/onlinebookstore:${BUILD_NUMBER}"
     CONTAINER_NAME = "onlinebookstore-container"
